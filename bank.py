@@ -4,11 +4,14 @@ import os
 DATA_FILE = "accounts.json"
 
 class BankAccount:
-    def __init__(self, username, password, balance):
+    def __init__(self, username, password, balance, already_in_pennies=False):
         
         self.username = username
         self.password = password
-        self.balance = self.to_twos_complement(int(round(balance * 100)))
+        if already_in_pennies:
+            self.balance = self.to_twos_complement(balance)
+        else:
+            self.balance = self.to_twos_complement(int(round(balance * 100)))
 
 
     def to_twos_complement(self, n):
@@ -53,7 +56,7 @@ class BankingSystem:
         with open(DATA_FILE, "r") as f:
             raw = json.load(f)
             return {
-                user: BankAccount(user, data["password"], self.from_twos_complement(int(data["balance"])))
+                user: BankAccount(user, data["password"], int(data["balance"]),already_in_pennies=True)
                 for user, data in raw.items()
             }
 
@@ -87,7 +90,7 @@ class BankingSystem:
             print("Invalid amount format.")
             return
 
-        self.accounts[username] = BankAccount(username, password, int(initial_deposit))
+        self.accounts[username] = BankAccount(username, password, initial_deposit)
         self.save_accounts()
         print("Account created successfully ^^")
 

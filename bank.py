@@ -7,7 +7,8 @@ class BankAccount:
     def __init__(self, username, password, balance):
         self.username = username
         self.password = password
-        self.balance = self.to_twos_complement(balance)
+        self.balance = self.to_twos_complement(int(round(balance * 100)))
+
 
     def to_twos_complement(self, n):
         if n < 0:
@@ -18,17 +19,22 @@ class BankAccount:
         n = self.balance
         if n & (1 << 31):
             return n - (1 << 32)
-        return n
+        return n/100
 
     def deposit(self, amount):
-        self.balance = self.to_twos_complement(round(self.from_twos_complement() + amount))
+        current = self.from_twos_complement()
+        new_total = current + amount
+        self.balance = self.to_twos_complement(int(round(new_total * 100)))
 
 
     def withdraw(self, amount):
-        if self.from_twos_complement() - amount >= -1500:
-            self.balance = self.to_twos_complement(round(self.from_twos_complement() - amount))
+        current = self.from_twos_complement()
+        if current - amount >= -1500:
+            new_total = current - amount
+            self.balance = self.to_twos_complement(int(round(new_total * 100)))
             return True
         return False
+
 
     def transfer(self, amount, other_account):
         if self.withdraw(amount):

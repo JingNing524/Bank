@@ -5,6 +5,7 @@ DATA_FILE = "accounts.json"
 
 class BankAccount:
     def __init__(self, username, password, balance):
+        
         self.username = username
         self.password = password
         self.balance = self.to_twos_complement(int(round(balance * 100)))
@@ -16,9 +17,9 @@ class BankAccount:
         return n
 
     def from_twos_complement(self):
-        n = self.balance
+        n = int(self.balance)
         if n & (1 << 31):
-            return n - (1 << 32)
+            n= n - (1 << 32)
         return n/100
 
     def deposit(self, amount):
@@ -51,8 +52,10 @@ class BankingSystem:
             return {}
         with open(DATA_FILE, "r") as f:
             raw = json.load(f)
-            return {user: BankAccount(user, data["password"], self.from_twos_complement(data["balance"]))
-                    for user, data in raw.items()}
+            return {
+                user: BankAccount(user, data["password"], self.from_twos_complement(int(data["balance"])))
+                for user, data in raw.items()
+            }
 
     def save_accounts(self):
         data = {user: {"password": acc.password, "balance": acc.balance}
